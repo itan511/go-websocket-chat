@@ -1,0 +1,12 @@
+FROM nginx:alpine
+
+RUN rm /etc/nginx/conf.d/default.conf
+
+COPY nginx.conf /etc/nginx/conf.d/
+
+COPY ./static /usr/share/nginx/html/static
+COPY ./templates /usr/share/nginx/html/
+
+CMD ["sh", "-c", "nginx -t && nginx -g 'daemon off;'"]
+
+EXPOSE 80

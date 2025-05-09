@@ -20,7 +20,7 @@ type Database struct {
 
 func NewDatabase() (*Database, error) {
 	if err := godotenv.Load("/app/.env"); err != nil {
-		return nil, fmt.Errorf("error loading /app/.env: %v", err)
+		return nil, err
 	}
 
 	dbUser := os.Getenv("DB_USER")
@@ -37,19 +37,19 @@ func NewDatabase() (*Database, error) {
 
 	db, err := sql.Open("postgres", dsn)
 	if err != nil {
-		return nil, fmt.Errorf("failed to open database: %v", err)
+		return nil, err
 	}
 
 	if err := db.Ping(); err != nil {
 		db.Close()
-		return nil, fmt.Errorf("failed to ping database: %v", err)
+		return nil, err
 	}
 
 	log.Println("Connected to the database successfully!")
 
 	if err := runMigrations(db); err != nil {
 		db.Close()
-		return nil, fmt.Errorf("failed to apply migrations: %v", err)
+		return nil, err
 	}
 
 	log.Println("Migrations applied successfully!")
@@ -60,20 +60,20 @@ func NewDatabase() (*Database, error) {
 func runMigrations(db *sql.DB) error {
 	driver, err := postgres.WithInstance(db, &postgres.Config{})
 	if err != nil {
-		return fmt.Errorf("error initializing postgres driver: %v", err)
+		return err
 	}
 
 	m, err := migrate.NewWithDatabaseInstance(
-		"file:///app/migrations",
+		"file://internal/db/migrations",
 		"postgres",
 		driver,
 	)
 	if err != nil {
-		return fmt.Errorf("failed to create migration instance: %v", err)
+		return err
 	}
 
 	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
-		return fmt.Errorf("migration failed: %v", err)
+		return err
 	}
 
 	return nil

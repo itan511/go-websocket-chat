@@ -1,0 +1,30 @@
+<div class="chat-page vh-100 d-flex flex-column">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+          <div class="container">
+              <span class="navbar-brand" id="roomName">Комната: </span>
+              <button class="btn btn-light" id="leaveRoomBtn">Покинуть комнату</button>
+          </div>
+      </nav>
+  
+      <div class="container-fluid flex-grow-1 d-flex p-0">
+          <div class="col-md-3 border-end p-3 bg-light">
+              <h5>Участники</h5>
+              <ul class="list-group" id="usersList">
+                  <!-- Участники будут здесь -->
+              </ul>
+          </div>
+          <div class="col-md-9 d-flex flex-column" style="height: calc(100vh - 56px);">
+              <div class="flex-grow-1 p-3 overflow-auto" id="messagesContainer">
+                  <!-- Сообщения будут здесь -->
+              </div>
+              <div class="p-3 border-top">
+                  <form id="messageForm" class="d-flex">
+                      <input type="text" class="form-control me-2" id="messageInput" placeholder="Ваше сообщение..." required>
+                      <button type="submit" class="btn btn-primary">Отправить</button>
+                  </form>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  <script src="/static/js/chat.js"></script>

@@ -2,11 +2,11 @@ package user
 
 import (
 	"context"
+	"go-websocket-chat/pkg"
 	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
-	"golang.org/x/crypto/bcrypt"
 )
 
 const (
@@ -29,7 +29,7 @@ func (s *service) CreateUser(c context.Context, req *CreateUserReq) (*CreateUser
 	ctx, cancel := context.WithTimeout(c, s.timeout)
 	defer cancel()
 
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	hashedPassword, err := pkg.HashPassword(req.Password)
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +37,7 @@ func (s *service) CreateUser(c context.Context, req *CreateUserReq) (*CreateUser
 	u := &User{
 		Username: req.Username,
 		Email:    req.Email,
-		Password: string(hashedPassword),
+		Password: hashedPassword,
 	}
 
 	r, err := s.Repository.CreateUser(ctx, u)
@@ -69,7 +69,7 @@ func (s *service) Login(c context.Context, req *LoginUserReq) (*LoginUserRes, er
 		return &LoginUserRes{}, err
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(req.Password))
+	err = pkg.CheckPassword(req.Password, u.Password)
 	if err != nil {
 		return &LoginUserRes{}, err
 	}

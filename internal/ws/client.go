@@ -3,7 +3,7 @@ package ws
 import (
 	"log"
 
-	"github.com/gofiber/websocket/v2"
+	"github.com/gorilla/websocket"
 )
 
 type Client struct {
@@ -26,16 +26,12 @@ func (c *Client) writeMessage() {
 	}()
 
 	for {
-		select {
-		case message, ok := <-c.Message:
-			if !ok {
-				return
-			}
-			if err := c.Conn.WriteJSON(message); err != nil {
-				log.Printf("write error: %v", err)
-				return
-			}
+		message, ok := <-c.Message
+		if !ok {
+			return
 		}
+
+		c.Conn.WriteJSON(message)
 	}
 }
 
@@ -46,16 +42,20 @@ func (c *Client) readMessage(hub *Hub) {
 	}()
 
 	for {
-		var msg Message
-		if err := c.Conn.ReadJSON(&msg); err != nil {
+		_, m, err := c.Conn.ReadMessage()
+		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				log.Printf("read error: %v", err)
+				log.Printf("error: %v", err)
 			}
 			break
 		}
 
-		msg.RoomID = c.RoomID
-		msg.Username = c.Username
-		hub.Broadcast <- &msg
+		msg := &Message{
+			Content:  string(m),
+			RoomID:   c.RoomID,
+			Username: c.Username,
+		}
+
+		hub.Broadcast <- msg
 	}
 }

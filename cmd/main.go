@@ -1,10 +1,10 @@
 package main
 
 import (
-	"go-websocket-chat/server/internal/db"
-	"go-websocket-chat/server/internal/router"
-	"go-websocket-chat/server/internal/user"
-	"go-websocket-chat/server/internal/ws"
+	"go-websocket-chat/internal/db"
+	"go-websocket-chat/internal/router"
+	"go-websocket-chat/internal/user"
+	"go-websocket-chat/internal/ws"
 	"log"
 )
 
